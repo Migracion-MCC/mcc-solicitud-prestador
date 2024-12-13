@@ -7,20 +7,63 @@ body {
   margin: 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.btn-primary{
+  background-color: #61a1fe;
+  border: 1px solid #eee;
+  padding: 10px;
+  text-align: center;
+  border-radius: 10%;
+  color: white;
+  font-weight: bold;
 }
 
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.btn-secondary{
+  background-color: grey;
+  border: 1px solid #eee;
+  padding: 10px;
+  text-align: center;
+  border-radius: 10%;
+  color: white;
+  font-weight: bold;
 }
 
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+ /* BARRA DE PROGRESO  */
+ .progress-bar-new {
+  display: flex;
+  justify-content: space-around;
+  position: relative;
 }
+.contenedor-barra{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 10px;
+}
+
+
+.step {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: lightgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.step.active {
+  background-color: #3badee;
+  color: white;
+}
+
+@media (max-width: 576px){
+  .contenedor-barra.mobile{
+    display: none;
+  }
+}
+
+/* FIN BARRA DE PROGRESO */
 
 @keyframes logo-spin {
   from {
