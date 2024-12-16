@@ -7,6 +7,22 @@ body {
   margin: 0;
 }
 
+/* Ocultar el input de archivo predeterminado */
+input[type="file"] {
+  display: none;
+}
+
+/* Estilo personalizado del botón de carga de archivos */
+.custom-file-upload {
+  color: black;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.custom-file-upload:hover {
+}
+
 .btn-primary{
   background-color: #61a1fe;
   border: 1px solid #eee;
