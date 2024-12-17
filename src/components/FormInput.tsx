@@ -1,4 +1,9 @@
-const FormInput = ({ fieldName }) => {
+interface props {
+  fieldName: string;
+}
+
+const FormInput = (props: props) => {
+  const fieldName = props.fieldName;
   return (
     <input
       type="text"

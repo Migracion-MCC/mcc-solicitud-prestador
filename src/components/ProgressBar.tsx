@@ -1,30 +1,24 @@
-import React from "react";
+interface props {
+  steps: Array<string>;
+  currentStep: number;
+}
 
-const ProgressBar = ({ steps, currentStep }) => {
+const ProgressBar = (props: props) => {
+  const { steps, currentStep } = props;
   return (
     <>
-      <div className="container progress-bar-new">
-        {steps.map((step: number, index: number) => (
+      <div className="progress-bar justify-center">
+        {Array.from(steps).map((step, index) => (
           <div
-            key={step}
-            className={`contenedor-barra ${
-              index !== currentStep ? "mobile" : ""
-            }`}
+            className={`step ${index <= currentStep ? "active" : ""}`}
+            key={index}
           >
-            <div className={`step ${index === currentStep ? "active" : ""}`}>
-              {index + 1}
-            </div>
-            <div className="text-center mt-2">
-              <strong
-                className={`paso ${index === currentStep ? "activo" : ""}`}
-              >
-                {step}
-              </strong>
-            </div>
+            <div className="circle">{index + 1}</div>
+            <div className="line"></div>
+            <div className="step-name font-bold">{step}</div>
           </div>
         ))}
       </div>
-      <hr />
     </>
   );
 };

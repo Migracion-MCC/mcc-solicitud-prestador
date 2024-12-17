@@ -1,28 +1,31 @@
+import { useState } from "react";
 import PageTitle from "../PageTitle";
 import "../../App.css";
-import { useState } from "react";
+import { FaRegFileImage } from "react-icons/fa";
 
 const Step1 = () => {
   const [files, setFiles] = useState<File[]>([]);
-  const [fileName, setFileName] = useState("Sin archivos seleccionados");
+  const [fileName, setFileName] = useState(
+    "Seleccione los archivos solicitados"
+  );
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = event.target.files;
 
     if (newFiles) {
       setFiles(Array.from(newFiles));
-      setFileName(`${newFiles.length} Archivos seleccionados`)
+      setFileName(`${newFiles.length} Archivos seleccionados`);
     }
   };
 
   const handleRemoveFile = (file: File) => {
     setFiles(files.filter((item) => item !== file));
     const newLength = files.length;
-    setFileName(`${newLength-1} Archivos seleccionados`)
+    setFileName(`${newLength - 1} Archivos seleccionados`);
   };
 
   return (
-    <div className="mx-36">
+    <div>
       <PageTitle
         title={"Requisitos o Información Adicional"}
         body={
@@ -66,18 +69,30 @@ const Step1 = () => {
             Subir archivos<span className="text-red-600">*</span>
           </p>
         </div>
-        <div className="col-span-2 py-2 px-2 mt-3 border border-slate-400 rounded">
-          <label htmlFor="file-upload" className="custom-file-upload">
-            {fileName}
-          </label>
-          <input
-            type="file"
-            name=""
-            id="file-upload"
-            className="w-full"
-            multiple
-            onChange={handleChange}
-          />
+
+        <div className="col-span-2">
+          <div className="py-2 px-2 mt-3 border border-slate-400 rounded border-b-red-600 border-b-2">
+            <input
+              type="file"
+              name=""
+              id="file-upload"
+              className="w-full"
+              multiple
+              value={""}
+              onChange={handleChange}
+            />
+          </div>
+          <p className="text-left">
+            <p className="font-bold text-gray-500">
+              Si el nombre del archivo cuenta con caracteres especiales no
+              permitidos, los mismos serán reemplazados para evitar problemas en
+              la carga de archivos.
+            </p>
+            <p className="font-bold text-gray-500">
+              Formatos permitidos: <span className="font-normal">..pdf,.doc,.docx,.jpg,.jpeg,.png</span>
+            </p>
+            <p className="font-bold text-gray-500">Peso máx. permitido 20MB</p>
+          </p>
         </div>
 
         <div className="mt-3 "></div>

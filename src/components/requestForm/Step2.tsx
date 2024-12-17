@@ -208,21 +208,21 @@ const Step2 = () => {
         </p>
 
         {field.type == "Input" && <FormInput fieldName={field.name} />}
-        {field.type == "Dropdown" && <FormSelectInput field={field} />}
+        {field.type == "Dropdown" && <FormSelectInput fields={[]} />}
       </div>
     );
   };
 
   return (
-    <>
+    <div className="container">
       <PageTitle
-        title={"Datos Solicitud"}
+        title={"Datos Solicitante"}
         body={
-          "Por favor complete los datos a continuación asociados al tipo de solicitud a realizar"
+          "Por favor complete el siguiente formulario con los datos del solicitante"
         }
       />
 
-      <div className="grid lg:grid-cols-2 sm:grid-cols-1 w-full p-7 border border-slate-400 rounded">
+      <div className="grid lg:grid-cols-2 sm:grid-cols-1 p-7 border border-slate-400 rounded">
         {applicantFields.map((field, index) => {
           return getFieldByType(field, index);
         })}
@@ -234,7 +234,7 @@ const Step2 = () => {
           "Por favor complete el siguiente formulario con los datos del prestador"
         }
       />
-      <div className="grid lg:grid-cols-2 sm:grid-cols-1 w-full p-7 border border-slate-400 rounded">
+      <div className="grid lg:grid-cols-2 sm:grid-cols-1 p-7 border border-slate-400 rounded">
         {providerFields.map((field, index) => {
           return getFieldByType(field, index);
         })}
@@ -242,7 +242,7 @@ const Step2 = () => {
       <div className="text-left  mx-auto m-5">
         <h1 className="font-bold text-red-500">* Datos obligatorios</h1>
       </div>
-    </>
+    </div>
   );
 };
 
