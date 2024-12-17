@@ -1,27 +1,20 @@
 import { useState } from "react";
 import PageTitle from "../PageTitle";
 import "../../App.css";
-import { FaRegFileImage } from "react-icons/fa";
 
 const Step1 = () => {
   const [files, setFiles] = useState<File[]>([]);
-  const [fileName, setFileName] = useState(
-    "Seleccione los archivos solicitados"
-  );
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = event.target.files;
 
     if (newFiles) {
       setFiles(Array.from(newFiles));
-      setFileName(`${newFiles.length} Archivos seleccionados`);
     }
   };
 
   const handleRemoveFile = (file: File) => {
     setFiles(files.filter((item) => item !== file));
-    const newLength = files.length;
-    setFileName(`${newLength - 1} Archivos seleccionados`);
   };
 
   return (
