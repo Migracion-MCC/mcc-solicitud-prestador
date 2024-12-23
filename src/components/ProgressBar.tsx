@@ -15,7 +15,9 @@ const ProgressBar = (props: props) => {
           >
             <div className="circle">{index + 1}</div>
             <div className="line"></div>
-            <div className="step-name font-bold">{step}</div>
+            <div className="step-name">
+              <p className="font-bold text-lg">{step}</p>
+            </div>
           </div>
         ))}
       </div>

@@ -1,214 +1,80 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import PageTitle from "../PageTitle";
 import FormInput from "../FormInput";
 import FormSelectInput from "../FormSelectInput";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../../store/store";
+import { setDropdownList as setDropdownListApplicant } from "../../store/reducers/applicantFieldsReducer";
+import { setDropdownList as setDropdownListProvider } from "../../store/reducers/providerFieldsReducer";
+
 import "../../App.css";
+import {
+  getCommunes,
+  getCountries,
+  getGenres,
+  getIdentificationTypes,
+  getRegions,
+} from ".";
 
 const Step2 = () => {
   interface field {
     name: string;
     hasErrors: boolean;
+    inputType: string;
+    required: boolean;
+    list?: [];
     type: string;
-    isMandatory: boolean;
+    value: string;
+    maxLength?: number;
   }
+  const applicantFields = useSelector(
+    (state: RootState) => state.applicantFields
+  );
+  const providerFields = useSelector(
+    (state: RootState) => state.providerFields
+  );
 
-  const [identificationTypes] = useState([]);
-  const [countries] = useState([]);
-  const [genres] = useState([]);
-  const [communes] = useState([]);
-  const [regions] = useState([]);
+  const dispatch: AppDispatch = useDispatch();
 
-  const [applicantFields] = useState([
-    {
-      name: "Tipo identificacion",
-      hasErrors: false,
-      type: "Dropdown",
-      isMandatory: true,
-      list: identificationTypes,
-      value: undefined,
-    },
-    {
-      name: "Comuna",
-      hasErrors: false,
-      type: "Dropdown",
-      isMandatory: true,
-      list: communes,
-      value: undefined,
-    },
-    {
-      name: "RUN",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-    {
-      name: "Dirección",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-    {
-      name: "Nacionalidad",
-      hasErrors: false,
-      type: "Dropdown",
-      isMandatory: true,
-      list: countries,
-      value: undefined,
-    },
-    {
-      name: "Teléfono 1",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-    {
-      name: "Nombres",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-    {
-      name: "Teléfono 2",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: false,
-      value: undefined,
-    },
-    {
-      name: "Apellidos",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-    {
-      name: "Teléfono Fijo",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: false,
-      value: undefined,
-    },
-    {
-      name: "Genero",
-      hasErrors: false,
-      type: "Dropdown",
-      isMandatory: true,
-      list: genres,
-      value: undefined,
-    },
-    {
-      name: "Email",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-    {
-      name: "Región",
-      hasErrors: false,
-      type: "Dropdown",
-      isMandatory: true,
-      list: regions,
-      value: undefined,
-    },
-    {
-      name: "Fecha Nacimiento",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-  ]);
+  useEffect(() => {
+    const getListsInformation = async () => {
+      const userTypes = await getIdentificationTypes();
+      const countries = await getCountries();
+      const genres = await getGenres();
+      const communes = await getCommunes();
+      const regions = await getRegions();
+      dispatch(
+        setDropdownListApplicant({
+          name: "Tipo identificacion",
+          value: userTypes,
+        })
+      );
+      dispatch(setDropdownListApplicant({ name: "Comuna", value: communes }));
+      dispatch(setDropdownListApplicant({ name: "Región", value: regions }));
+      dispatch(setDropdownListApplicant({ name: "Genero", value: genres }));
+      dispatch(
+        setDropdownListApplicant({ name: "Nacionalidad", value: countries })
+      );
 
-  const [providerFields] = useState([
-    {
-      name: "RUT",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-    {
-      name: "Dirección",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-    {
-      name: "Nombre Razón Social",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-    {
-      name: "Teléfono 1",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-    {
-      name: "Nombre Fantasía",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-    {
-      name: "Teléfono 2",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: false,
-      value: undefined,
-    },
-    {
-      name: "Región",
-      hasErrors: false,
-      type: "Dropdown",
-      isMandatory: true,
-      list: regions,
-      value: undefined,
-    },
-    {
-      name: "Teléfono fijo",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: false,
-      value: undefined,
-    },
-    {
-      name: "Comuna",
-      hasErrors: false,
-      type: "Dropdown",
-      isMandatory: true,
-      list: communes,
-      value: undefined,
-    },
-    {
-      name: "Email",
-      hasErrors: false,
-      type: "Input",
-      isMandatory: true,
-      value: undefined,
-    },
-  ]);
+      dispatch(setDropdownListProvider({ name: "Comuna", value: communes }));
+      dispatch(setDropdownListProvider({ name: "Región", value: regions }));
+    };
+    getListsInformation();
+  }, []);
 
-  const getFieldByType = (field: field, index: number) => {
+  const getFieldByType = (field: field, index: number, origin: string) => {
     return (
       <div className="grid grid-cols-2 mr-5 py-2 px-2" key={index}>
         <p className="text-left font-bold">
           {field.name}:
-          {field.isMandatory && <span className="text-red-600">*</span>}
+          {field.required && <span className="text-red-600">*</span>}
         </p>
 
-        {field.type == "Input" && <FormInput fieldName={field.name} />}
-        {field.type == "Dropdown" && <FormSelectInput fields={[]} />}
+        {field.inputType == "Input" && <FormInput field={field} origin={origin}/>}
+
+        {field.inputType == "Dropdown" && (
+          <FormSelectInput fields={field.list ? field.list : []} field={field} origin={origin}/>
+        )}
       </div>
     );
   };
@@ -224,7 +90,7 @@ const Step2 = () => {
 
       <div className="grid lg:grid-cols-2 sm:grid-cols-1 p-7 border border-slate-400 rounded">
         {applicantFields.map((field, index) => {
-          return getFieldByType(field, index);
+          return getFieldByType(field, index, "applicant");
         })}
       </div>
 
@@ -236,7 +102,7 @@ const Step2 = () => {
       />
       <div className="grid lg:grid-cols-2 sm:grid-cols-1 p-7 border border-slate-400 rounded">
         {providerFields.map((field, index) => {
-          return getFieldByType(field, index);
+          return getFieldByType(field, index, "provider");
         })}
       </div>
       <div className="text-left  mx-auto m-5">

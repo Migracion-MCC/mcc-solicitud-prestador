@@ -11,7 +11,12 @@ const App = () => {
     "Datos Solicitante y Prestador",
     "Comprobante de envío",
   ];
+  
   const [currentStep, setCurrentStep] = useState(0);
+  const handleStepper=() =>{
+    
+  }
+
 
   const getFormButtons = () => {
     if (currentStep == 0) {
