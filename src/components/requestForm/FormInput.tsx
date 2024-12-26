@@ -1,14 +1,14 @@
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store/store";
+import { AppDispatch } from "../../store/store";
 import {
   changeInputValue as changeInputValueApplicant,
   setErrors as setErrorsApplicant,
-} from "../store/reducers/applicantFieldsReducer";
+} from "../../store/reducers/applicantFieldsReducer";
 
 import {
   changeInputValue as changeInputValueProvider,
   setErrors as setErrorsProvideer,
-} from "../store/reducers/providerFieldsReducer";
+} from "../../store/reducers/providerFieldsReducer";
 
 import { ChangeEvent } from "react";
 import isEmpty from "validator/lib/isEmpty";
@@ -80,8 +80,8 @@ const FormInput = (props: props) => {
       type={field.type || "text"}
       maxLength={field.maxLength ? field.maxLength : undefined}
       className={
-        field.hasErrors
-          ? "border-2 p-1.5 rounded border-spacing-y-60 border-red-500 placeholder:text-red-500 text-red-500"
+        (field.hasErrors && isEmpty(field.value))
+          ? "border-2 p-1.5 rounded border-spacing-y-60 border-b-red-500"
           : "border-2 p-1.5 rounded border-spacing-y-60"
       }
       placeholder={field.name}

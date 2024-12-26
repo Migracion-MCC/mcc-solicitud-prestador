@@ -1,22 +1,34 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface FilePayload {
-  file: File;
+interface FormFile {
+  base64: string;
+  fileName: string;
+  uuid: string;
 }
-const initialState: File[] = [];
+
+interface RemoveFilePayload {
+  uuid: string
+}
+
+const initialState: FormFile[] = [];
 
 const applicantFilesSlice = createSlice({
   name: 'applicantFiles',
   initialState,
   reducers: {
-    addFile: (state, action: PayloadAction<FilePayload>) => {
-      console.log("llegas")
-      const { file } = action.payload;
-      state.push(file)
+    addFile: (state, action: PayloadAction<FormFile>) => {
+      const { base64, fileName, uuid } = action.payload;
+      const newFile: FormFile = {
+        base64: base64, fileName: fileName, uuid: uuid
+      }
+      state.push(newFile)
+    },
+    removeFile: (state, action: PayloadAction<RemoveFilePayload>) => {
+      const { uuid } = action.payload;
+      return state.filter((item: FormFile) => item.uuid !== uuid);
     },
   },
+}); 
 
-});
-
-export const { addFile } = applicantFilesSlice.actions;
+export const { addFile, removeFile } = applicantFilesSlice.actions;
 export default applicantFilesSlice.reducer;

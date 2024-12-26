@@ -1,60 +1,78 @@
 import { useState } from "react";
 import "./App.css";
-import ProgressBar from "./components/ProgressBar";
+import ProgressBar from "./components/progressbar/ProgressBar";
 import Step1 from "./components/requestForm/Step1";
 import Step2 from "./components/requestForm/Step2";
 import Step3 from "./components/requestForm/Step3";
+import { useSelector } from "react-redux";
+import { RootState } from "./store/store";
 
 const App = () => {
+  const applicantFiles = useSelector(
+    (state: RootState) => state.applicantFiles
+  );
+
   const steps = [
     "Ingreso documentos",
     "Datos Solicitante y Prestador",
     "Comprobante de envío",
   ];
-  
+
   const [currentStep, setCurrentStep] = useState(0);
-  const handleStepper=() =>{
-    
-  }
 
+  const validateFormData = () => {
+    return true;
+  };
 
-  const getFormButtons = () => {
-    if (currentStep == 0) {
-      return (
-        <button
-          className="btn-primary"
-          onClick={() => {
-            window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-            setCurrentStep(currentStep + 1);
-          }}
-        >
-          Aceptar
-        </button>
-      );
-    } else if (currentStep == 1) {
-      return (
-        <>
-          <button
-            className="btn-secondary mr-2"
-            onClick={() => {
-              window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-              setCurrentStep(currentStep - 1);
-            }}
-          >
-            Volver
-          </button>
+  const handleStepper = () => {
+    if (currentStep == 0 && applicantFiles.length > 10) {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      setCurrentStep(currentStep + 1);
+    }
+
+    if (currentStep == 1 && validateFormData()) {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const getStepperButtons = () => {
+    return (
+      <div>
+        {currentStep == 0 && (
           <button
             className="btn-primary"
             onClick={() => {
-              window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-              setCurrentStep(currentStep + 1);
+              handleStepper();
             }}
           >
             Aceptar
           </button>
-        </>
-      );
-    }
+        )}
+        {currentStep == 1 && (
+          <>
+            <button
+              className="btn-secondary mr-2"
+              onClick={() => {
+                window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                setCurrentStep(currentStep - 1);
+              }}
+            >
+              Volver
+            </button>
+            <button
+              className="btn-primary"
+              onClick={() => {
+                window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                setCurrentStep(currentStep + 1);
+              }}
+            >
+              Aceptar
+            </button>
+          </>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -67,7 +85,7 @@ const App = () => {
         {currentStep == 1 && <Step2 />}
         {currentStep == 2 && <Step3 />}
 
-        <div>{getFormButtons()}</div>
+        <div>{getStepperButtons()}</div>
       </div>
     </>
   );

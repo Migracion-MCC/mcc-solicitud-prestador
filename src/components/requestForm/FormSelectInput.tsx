@@ -1,8 +1,9 @@
-import { changeInputValue as changeInputValueApplicant } from "../store/reducers/applicantFieldsReducer";
+import { changeInputValue as changeInputValueApplicant } from "../../store/reducers/applicantFieldsReducer";
 
-import { changeInputValue as changeInputValueProvider } from "../store/reducers/providerFieldsReducer";
+import { changeInputValue as changeInputValueProvider } from "../../store/reducers/providerFieldsReducer";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store/store";
+import { AppDispatch } from "../../store/store";
+import { useState } from "react";
 
 interface listField {
   idTipoUsuario: number;
@@ -28,9 +29,14 @@ interface props {
 
 const FormSelectInput = (props: props) => {
   const { fields, field, origin } = props;
+  const [hasErrors, setHasErrors] = useState(false);
   const dispatch: AppDispatch = useDispatch();
 
   const handleChange = (value: string) => {
+    if (value == "0" || value == "" || value == undefined || value == " ") {
+      setHasErrors(true);
+    }
+
     if (origin == "applicant") {
       dispatch(changeInputValueApplicant({ value: value, name: field.name }));
     } else {
@@ -41,11 +47,11 @@ const FormSelectInput = (props: props) => {
 
   return (
     <select
-      className={
-        fields.length > 0
-          ? "border-2 p-1.5 rounded"
-          : "border-2 p-1.5 rounded bg-slate-300"
-      }
+      className={`border-2 p-1.5 rounded ${
+        fields.length == 0 && "bg-slate-300"
+      } 
+      ${hasErrors && "border-b-red-500 border-b-4"}
+      `}
       disabled={fields.length == 0}
       onChange={(e) => handleChange(e.target.value)}
     >

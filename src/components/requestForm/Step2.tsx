@@ -1,13 +1,12 @@
 import { useEffect } from "react";
-import PageTitle from "../PageTitle";
-import FormInput from "../FormInput";
-import FormSelectInput from "../FormSelectInput";
+import "../../App.css";
+import PageTitle from "../pagetitle/PageTitle";
+import FormInput from "./FormInput";
+import FormSelectInput from "./FormSelectInput";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
 import { setDropdownList as setDropdownListApplicant } from "../../store/reducers/applicantFieldsReducer";
 import { setDropdownList as setDropdownListProvider } from "../../store/reducers/providerFieldsReducer";
-
-import "../../App.css";
 import {
   getCommunes,
   getCountries,
@@ -17,6 +16,8 @@ import {
 } from ".";
 
 const Step2 = () => {
+  const dispatch: AppDispatch = useDispatch();
+
   interface field {
     name: string;
     hasErrors: boolean;
@@ -27,14 +28,13 @@ const Step2 = () => {
     value: string;
     maxLength?: number;
   }
-  const applicantFields = useSelector(
-    (state: RootState) => state.applicantFields
+  
+  const { applicantFields, providerFields } = useSelector(
+    (state: RootState) => ({
+      applicantFields: state.applicantFields,
+      providerFields: state.providerFields,
+    })
   );
-  const providerFields = useSelector(
-    (state: RootState) => state.providerFields
-  );
-
-  const dispatch: AppDispatch = useDispatch();
 
   useEffect(() => {
     const getListsInformation = async () => {
@@ -70,10 +70,16 @@ const Step2 = () => {
           {field.required && <span className="text-red-600">*</span>}
         </p>
 
-        {field.inputType == "Input" && <FormInput field={field} origin={origin}/>}
+        {field.inputType == "Input" && (
+          <FormInput field={field} origin={origin} />
+        )}
 
         {field.inputType == "Dropdown" && (
-          <FormSelectInput fields={field.list ? field.list : []} field={field} origin={origin}/>
+          <FormSelectInput
+            fields={field.list ? field.list : []}
+            field={field}
+            origin={origin}
+          />
         )}
       </div>
     );

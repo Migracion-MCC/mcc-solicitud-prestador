@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import Banner from "./components/Banner";
+import Banner from "./components/banner/Banner.tsx";
 import { Provider } from "react-redux";
 import store from './store/store.js';
 import "./index.css";
