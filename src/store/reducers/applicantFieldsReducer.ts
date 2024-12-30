@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface Field {
+export interface Field {
   name: string;
   hasErrors: boolean;
   inputType: string;
@@ -160,14 +160,14 @@ const applicantFieldsSlice = createSlice({
   reducers: {
     changeInputValue: (state, action: PayloadAction<UpdateFieldPayload>) => {
       const { value, name } = action.payload;
-      const field = state.find((field) => field.name === name);
+      const field = state.find((field) => field.name == name);
       if (field) {
         field.value = value;
       }
     },
     setDropdownList: (state, action: PayloadAction<setDropdownListPayload>) => {
       const { name, value } = action.payload;
-      const field = state.find((field) => field.name === name);
+      const field = state.find((field) => field.name == name);
       if (field) {
         field.list = value;
       }

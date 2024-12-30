@@ -4,12 +4,31 @@ import ProgressBar from "./components/progressbar/ProgressBar";
 import Step1 from "./components/requestForm/Step1";
 import Step2 from "./components/requestForm/Step2";
 import Step3 from "./components/requestForm/Step3";
-import { useSelector } from "react-redux";
-import { RootState } from "./store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "./store/store";
+import { validateFormData, validateFormFiles } from "./components/requestForm";
+import Loader from "./components/loader/Loader";
+import { setLoading } from "./store/reducers/generalDataReducer";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 const App = () => {
-  const applicantFiles = useSelector(
-    (state: RootState) => state.applicantFiles
+  const dispatch: AppDispatch = useDispatch();
+  const { applicantFiles, applicantFields, providerFields, generalData } = useSelector(
+    (state: RootState) => ({
+      applicantFiles: state.applicantFiles,
+      applicantFields: state.applicantFields,
+      providerFields: state.providerFields,
+      generalData: state.generalData,
+    })
   );
 
   const steps = [
@@ -20,21 +39,30 @@ const App = () => {
 
   const [currentStep, setCurrentStep] = useState(0);
 
-  const validateFormData = () => {
-    return true;
-  };
-
   const handleStepper = () => {
-    if (currentStep == 0 && applicantFiles.length > 10) {
+    if (currentStep == 0) {
+      if (validateFormFiles(applicantFiles.applicantRequiredFiles)) {
+        return false;
+      }
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       setCurrentStep(currentStep + 1);
     }
 
-    if (currentStep == 1 && validateFormData()) {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-      setCurrentStep(currentStep + 1);
+    if (currentStep == 1) {
+      if (validateFormData(applicantFields, providerFields)) {
+        return false;
+      }
+      setOpenSendForm(true)
     }
   };
+
+  const sendForm = async () => {
+    setOpenSendForm(false)
+    dispatch(setLoading({ loading: true }));
+    
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    setCurrentStep(currentStep + 1);
+  }
 
   const getStepperButtons = () => {
     return (
@@ -46,7 +74,7 @@ const App = () => {
               handleStepper();
             }}
           >
-            Aceptar
+            Siguiente
           </button>
         )}
         {currentStep == 1 && (
@@ -62,21 +90,41 @@ const App = () => {
             </button>
             <button
               className="btn-primary"
-              onClick={() => {
-                window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-                setCurrentStep(currentStep + 1);
-              }}
-            >
-              Aceptar
+              onClick={() => { handleStepper() }}>
+              Crear solicitud
             </button>
           </>
         )}
       </div>
     );
   };
+  const [isOpenSendForm, setOpenSendForm] = useState(false);
 
   return (
     <>
+      <AlertDialog
+        open={isOpenSendForm}
+        onOpenChange={setOpenSendForm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Envío de Solicitud</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Está seguro de enviar la solicitud ingresada?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="btn-secondary">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="btn-primary"
+              onClick={async () => {
+                await sendForm();
+              }}>Enviar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Loader show={generalData.loading} />
+
       <div className="inline-block align-middle my-5 w-4/5">
         <ProgressBar steps={steps} currentStep={currentStep} />
         <hr />

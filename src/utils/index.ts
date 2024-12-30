@@ -15,14 +15,12 @@ export const fileToBase64 = (file: File): Promise<string> =>
     });
 
 export const validateRut = (rut: string): boolean => {
-    // Validate format using a regular expression
-    const rutRegex = /^[0-9]{7,8}-[0-9Kk]$/;
-    if (!rutRegex.test(rut)) return false;
 
-    // Split the RUT into body and verification digit
+    const rutRegex = /^[0-9]{7,8}-[0-9Kk]$/;
+
+    if (!rutRegex.test(rut)) return false;
     const [body, verificationDigit] = rut.split('-');
 
-    // Calculate the verification digit
     let sum = 0;
     let multiplier = 2;
 
@@ -35,7 +33,6 @@ export const validateRut = (rut: string): boolean => {
     const calculatedDigit =
         remainder === 0 ? '0' : remainder === 1 ? 'K' : (11 - remainder).toString();
 
-    // Compare the calculated digit with the provided one
     return verificationDigit.toUpperCase() === calculatedDigit;
 }
 

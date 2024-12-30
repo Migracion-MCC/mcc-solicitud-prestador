@@ -1,12 +1,29 @@
-import { useState } from "react";
+import { Field } from "@/store/reducers/applicantFieldsReducer";
+import { RootState } from "@/store/store";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const TramiteFinalizado = () => {
-  const [correo] = useState("osvaldo143143@gmail.com");
+  const [correo, setCorreo] = useState("");
   const [folio] = useState("876782867");
+  const { applicantFields} = useSelector(
+    (state: RootState) => ({
+      applicantFields: state.applicantFields,
+    })
+  );
+
+  useEffect(() => {
+    applicantFields.forEach((field: Field) => {
+      if (field.name === "Email") {
+        setCorreo(field.value);
+      }
+    });
+    
+    console.log("correo", correo);
+  }, [applicantFields, correo]);
 
   return (
     <div>
-      {/* Mensaje proceso completado */}
       <div className="mt-10">
         <div className="">
           <div className="alert-success py-5 border rounded shadow-xl">

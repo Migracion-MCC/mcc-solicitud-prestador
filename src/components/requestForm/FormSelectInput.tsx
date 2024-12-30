@@ -1,13 +1,23 @@
-import { changeInputValue as changeInputValueApplicant } from "../../store/reducers/applicantFieldsReducer";
+import {
+  changeInputValue as changeInputValueApplicant,
+  setDropdownList as setDropdownListApplicant
+} from "../../store/reducers/applicantFieldsReducer";
 
-import { changeInputValue as changeInputValueProvider } from "../../store/reducers/providerFieldsReducer";
+import {
+  changeInputValue as changeInputValueProvider,
+  setDropdownList as setDropdownListProvider
+} from "../../store/reducers/providerFieldsReducer";
+import { setLoading } from "@/store/reducers/generalDataReducer";
+
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { useState } from "react";
+import { getCommunes } from ".";
 
-interface listField {
-  idTipoUsuario: number;
-  nombreTipoUsuario: string;
+interface Option {
+  codigoPrincipal: string;
+  descripcion: string;
+  idIdentificacion?: string;
 }
 
 interface field {
@@ -22,7 +32,7 @@ interface field {
 }
 
 interface props {
-  fields: Array<listField>;
+  fields: Array<Option>;
   origin: string;
   field: field;
 }
@@ -33,8 +43,10 @@ const FormSelectInput = (props: props) => {
   const dispatch: AppDispatch = useDispatch();
 
   const handleChange = (value: string) => {
-    if (value == "0" || value == "" || value == undefined || value == " ") {
+    if (!value.trim()) {
       setHasErrors(true);
+    }else{
+      setHasErrors(false);
     }
 
     if (origin == "applicant") {
@@ -42,14 +54,41 @@ const FormSelectInput = (props: props) => {
     } else {
       dispatch(changeInputValueProvider({ value: value, name: field.name }));
     }
-    console.log(value);
+
+    if (field.name == "Región") {
+      setCommunesByRegion(value);
+    }
+  };
+
+  const setCommunesByRegion = async (value: string) => {
+    dispatch(setLoading({ loading: true }));
+    try {
+      const communes = await getCommunes(value);
+      const action =
+        origin === "applicant"
+          ? setDropdownListApplicant({ name: "Comuna", value: communes })
+          : setDropdownListProvider({ name: "Comuna", value: communes });
+      dispatch(action);
+    } catch (error) {
+      console.error("Failed to fetch communes:", error);
+    }
+    dispatch(setLoading({ loading: false }));
+  };
+
+  const getDisplayOption = (item: Option, index: number) => {
+    const key = item.codigoPrincipal || item.idIdentificacion;
+    const label = item.descripcion;
+    return (
+      <option value={key} key={index}>
+        {label}
+      </option>
+    );
   };
 
   return (
     <select
-      className={`border-2 p-1.5 rounded ${
-        fields.length == 0 && "bg-slate-300"
-      } 
+      className={`border-2 p-1.5 rounded ${fields.length == 0 && "bg-slate-300"
+        } 
       ${hasErrors && "border-b-red-500 border-b-4"}
       `}
       disabled={fields.length == 0}
@@ -58,12 +97,8 @@ const FormSelectInput = (props: props) => {
       <option value="" hidden>
         Seleccione una opción
       </option>
-      {fields.map((item: listField, index) => {
-        return (
-          <option value={item.idTipoUsuario} key={index}>
-            {item.nombreTipoUsuario}
-          </option>
-        );
+      {fields.map((item, index) => {
+        return getDisplayOption(item, index);
       })}
     </select>
   );

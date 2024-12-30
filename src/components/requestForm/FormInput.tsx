@@ -13,7 +13,8 @@ import {
 import { ChangeEvent } from "react";
 import isEmpty from "validator/lib/isEmpty";
 import isEmail from "validator/lib/isEmail";
-import matches from "validator/lib/matches";
+import { validateRut } from "@/utils";
+import { getNamesByRut } from ".";
 
 interface props {
   field: field;
@@ -35,7 +36,10 @@ const FormInput = (props: props) => {
   const dispatch: AppDispatch = useDispatch();
   const { field, origin } = props;
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>, field: field) => {
+  const handleChange = async (
+    event: ChangeEvent<HTMLInputElement>,
+    field: field
+  ) => {
     const target = event.target;
     let changeInputValue;
     let setErrors;
@@ -51,14 +55,35 @@ const FormInput = (props: props) => {
       changeInputValue({ value: target.value.trim(), name: field.name })
     );
 
+    let isValidRut;
     switch (field.name) {
       case "RUN":
+        isValidRut = validateRut(target.value);
         dispatch(
           setErrors({
-            value: !matches(target.value, /^\d{1,8}-[0-9Kk]$/),
+            value: isValidRut==false,
             name: field.name,
           })
         );
+        console.log(isValidRut);
+        if (isValidRut) {
+          const rut = target.value;
+          const result = await getNamesByRut(rut);
+          
+          dispatch(
+            changeInputValue({
+              value: result.nombres,
+              name: "Nombres",
+            })
+          );
+
+          dispatch(
+            changeInputValue({
+              value: result.primerApellido + " " + result.segundoApellido,
+              name: "Apellidos",
+            })
+          );
+        }
         break;
       case "Email":
         dispatch(
@@ -80,11 +105,12 @@ const FormInput = (props: props) => {
       type={field.type || "text"}
       maxLength={field.maxLength ? field.maxLength : undefined}
       className={
-        (field.hasErrors && isEmpty(field.value))
+        field.hasErrors && isEmpty(field.value)
           ? "border-2 p-1.5 rounded border-spacing-y-60 border-b-red-500"
           : "border-2 p-1.5 rounded border-spacing-y-60"
       }
       placeholder={field.name}
+      value={field.value}
       onChange={(event) => handleChange(event, field)}
     />
   );

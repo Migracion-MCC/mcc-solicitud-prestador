@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import "../../App.css";
 import PageTitle from "../pagetitle/PageTitle";
+import Loader from "../loader/Loader";
 import FormInput from "./FormInput";
 import FormSelectInput from "./FormSelectInput";
 import { useSelector, useDispatch } from "react-redux";
@@ -8,12 +9,12 @@ import { RootState, AppDispatch } from "../../store/store";
 import { setDropdownList as setDropdownListApplicant } from "../../store/reducers/applicantFieldsReducer";
 import { setDropdownList as setDropdownListProvider } from "../../store/reducers/providerFieldsReducer";
 import {
-  getCommunes,
   getCountries,
   getGenres,
   getIdentificationTypes,
   getRegions,
 } from ".";
+import { setLoading } from "@/store/reducers/generalDataReducer";
 
 const Step2 = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -29,19 +30,20 @@ const Step2 = () => {
     maxLength?: number;
   }
   
-  const { applicantFields, providerFields } = useSelector(
+  const { applicantFields, providerFields, generalData } = useSelector(
     (state: RootState) => ({
       applicantFields: state.applicantFields,
       providerFields: state.providerFields,
+      generalData: state.generalData,
     })
   );
 
   useEffect(() => {
     const getListsInformation = async () => {
+      dispatch(setLoading({ loading: true }));
       const userTypes = await getIdentificationTypes();
       const countries = await getCountries();
       const genres = await getGenres();
-      const communes = await getCommunes();
       const regions = await getRegions();
       dispatch(
         setDropdownListApplicant({
@@ -49,18 +51,18 @@ const Step2 = () => {
           value: userTypes,
         })
       );
-      dispatch(setDropdownListApplicant({ name: "Comuna", value: communes }));
+
       dispatch(setDropdownListApplicant({ name: "Región", value: regions }));
       dispatch(setDropdownListApplicant({ name: "Genero", value: genres }));
       dispatch(
         setDropdownListApplicant({ name: "Nacionalidad", value: countries })
       );
 
-      dispatch(setDropdownListProvider({ name: "Comuna", value: communes }));
       dispatch(setDropdownListProvider({ name: "Región", value: regions }));
+      dispatch(setLoading({ loading: false }));
     };
     getListsInformation();
-  }, []);
+  }, [dispatch]);
 
   const getFieldByType = (field: field, index: number, origin: string) => {
     return (
@@ -93,7 +95,8 @@ const Step2 = () => {
           "Por favor complete el siguiente formulario con los datos del solicitante"
         }
       />
-
+      <Loader show={generalData.loading} />
+      
       <div className="grid lg:grid-cols-2 sm:grid-cols-1 p-7 border border-slate-400 rounded">
         {applicantFields.map((field, index) => {
           return getFieldByType(field, index, "applicant");

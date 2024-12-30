@@ -1,15 +1,43 @@
-// import { RS_ListarTipoUsuario } from '../../constants/ExternalServices';
-const apiKey = "SL2oAzoElXZqTcXJTazgxYu2Phe2F0ek"
+import { RequirementFile } from "@/store/reducers/applicantFilesReducer";
+import { config } from "@/config";
+import { Field } from "@/store/reducers/applicantFieldsReducer";
 
-export const getIdentificationTypes = async () => {
+export const getNamesByRut = async (rut: string) => {
   try {
     const response = await fetch(
-      "https://api.cloud-qa.fonasa.cl/SolicitudesCiudadanas/ListarTipoIdentificacion",
+      `${config.api.BASE_URL}/${config.api.services.GET_NAMES_BY_RUT}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "ApiKey": apiKey,
+          "ApiKey": config.api.API_KEY,
+        },
+        body: JSON.stringify({
+          "run": rut
+        })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const getIdentificationTypes = async () => {
+  try {
+    const response = await fetch(
+      `${config.api.BASE_URL}/${config.api.services.GET_IDENTIFICATION_TYPES}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "ApiKey": config.api.API_KEY,
         },
         body: JSON.stringify({})
       }
@@ -29,14 +57,25 @@ export const getIdentificationTypes = async () => {
 export const getCountries = async () => {
   try {
     const response = await fetch(
-      "https://api.cloud-qa.fonasa.cl/SolicitudesCiudadanas/ListarTipoUsuario",
+      `${config.api.BASE_URL}/${config.api.services.GET_COUNTRIES}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "ApiKey": apiKey,
+          "ApiKey": config.api.API_KEY,
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({
+          "headerRequest": {
+            "userID": "",
+            "rolID": "",
+            "SucursalID": "",
+            "fechaHora": ""
+          },
+          "bodyRequest": {
+            "codigoTipoColeccion": 7,
+            "codigoItemPadre": ""
+          }
+        })
       }
     );
 
@@ -45,7 +84,7 @@ export const getCountries = async () => {
     }
 
     const result = await response.json();
-    return result.listado ? result.listado : []
+    return result.bodyResponse.coleccion.item ? result.bodyResponse.coleccion.item : []
   } catch (err) {
     console.log(err);
   }
@@ -54,14 +93,25 @@ export const getCountries = async () => {
 export const getGenres = async () => {
   try {
     const response = await fetch(
-      "https://api.cloud-qa.fonasa.cl/SolicitudesCiudadanas/ListarTipoUsuario",
+      `${config.api.BASE_URL}/${config.api.services.GET_GENRES}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "ApiKey": apiKey,
+          "ApiKey": config.api.API_KEY,
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({
+          "headerRequest": {
+            "userID": "",
+            "rolID": "",
+            "SucursalID": "",
+            "fechaHora": ""
+          },
+          "bodyRequest": {
+            "codigoTipoColeccion": 4,
+            "codigoItemPadre": ""
+          }
+        })
       }
     );
 
@@ -70,23 +120,37 @@ export const getGenres = async () => {
     }
 
     const result = await response.json();
-    return result.listado ? result.listado : []
+    console.log(result)
+    return result.bodyResponse.coleccion.item ? result.bodyResponse.coleccion.item : []
   } catch (err) {
     console.log(err);
   }
 };
 
-export const getCommunes = async () => {
+export const getCommunes = async (regionId: string) => {
   try {
     const response = await fetch(
-      "https://api.cloud-qa.fonasa.cl/SolicitudesCiudadanas/ListarTipoUsuario",
+      `${config.api.BASE_URL}/${config.api.services.GET_COMMUNES}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "ApiKey": apiKey,
+          "ApiKey": config.api.API_KEY,
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({
+
+          "headerRequest": {
+            "userID": "",
+            "rolID": "",
+            "SucursalID": "",
+            "fechaHora": ""
+          },
+          "bodyRequest": {
+            "codigoTipoColeccion": 103,
+            "codigoItemPadre": regionId
+
+          }
+        })
       }
     );
 
@@ -95,7 +159,7 @@ export const getCommunes = async () => {
     }
 
     const result = await response.json();
-    return result.listado ? result.listado : []
+    return result.bodyResponse.coleccion.item ? result.bodyResponse.coleccion.item : []
   } catch (err) {
     console.log(err);
   }
@@ -104,14 +168,25 @@ export const getCommunes = async () => {
 export const getRegions = async () => {
   try {
     const response = await fetch(
-      "https://api.cloud-qa.fonasa.cl/SolicitudesCiudadanas/ListarTipoUsuario",
+      `${config.api.BASE_URL}/${config.api.services.GET_REGIONS}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "ApiKey": apiKey,
+          "ApiKey": config.api.API_KEY,
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({
+          "headerRequest": {
+            "userID": "",
+            "rolID": "",
+            "SucursalID": "",
+            "fechaHora": ""
+          },
+          "bodyRequest": {
+            "codigoTipoColeccion": 101,
+            "codigoItemPadre": ""
+          }
+        })
       }
     );
 
@@ -120,7 +195,7 @@ export const getRegions = async () => {
     }
 
     const result = await response.json();
-    return result.listado ? result.listado : []
+    return result.bodyResponse.coleccion.item ? result.bodyResponse.coleccion.item : []
   } catch (err) {
     console.log(err);
   }
@@ -129,14 +204,14 @@ export const getRegions = async () => {
 export const getListApplicationRequirements = async () => {
   try {
     const response = await fetch(
-      "https://api.cloud-qa.fonasa.cl/SolicitudesCiudadanas/ListarRequisitosSolicitud",
+      `${config.api.BASE_URL}/${config.api.services.GET_APPLICATION_REQUIREMENTS}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "ApiKey": apiKey,
+          "ApiKey": config.api.API_KEY,
         },
-        body: JSON.stringify({idDetalleSolicitud: 1496})
+        body: JSON.stringify({ idDetalleSolicitud: 1496 })
       }
     );
 
@@ -159,12 +234,12 @@ export const postSendForm = async () => {
 
     }
     const response = await fetch(
-      "https://api.cloud-qa.fonasa.cl/SolicitudesCiudadanas/CrearSolicitudCiudadana",
+      `${config.api.BASE_URL}/${config.api.services.POST_SEND_FORM}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "ApiKey": apiKey,
+          "ApiKey": config.api.API_KEY,
         },
         body: JSON.stringify(body)
       }
@@ -182,3 +257,32 @@ export const postSendForm = async () => {
 
 };
 
+export const validateFormData = (applicantFields: Field[], providerFields: Field[]) => {
+  let hasErrors = false;
+
+  applicantFields.forEach((field: Field) => {
+    if (field.required === true && field.value === "") {
+      hasErrors = true;
+    }
+  });
+
+  providerFields.forEach((field: Field) => {
+    if (field.required === true && field.value === "") {
+      hasErrors = true;
+    }
+  });
+
+  return !hasErrors;
+}
+
+
+export const validateFormFiles = (applicantRequiredFiles: RequirementFile[]) => {
+  return true;
+  const expectedFiles = applicantRequiredFiles.filter(
+    (file: RequirementFile) => file.obligarorio === 1
+  );
+  const currentFiles = applicantRequiredFiles.filter(
+    (file: RequirementFile) => file.base64 != null
+  );
+  return expectedFiles.length === currentFiles.length;
+};

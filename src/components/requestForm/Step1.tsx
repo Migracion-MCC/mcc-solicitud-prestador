@@ -6,9 +6,16 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
 import { setLoading } from "../../store/reducers/generalDataReducer";
 import {
-  addFile,
-  removeFile,
+  addOptionalFile,
+  removeOptionalFile,
+  setRequiredFiles,
+  editRequiredFile,
 } from "../../store/reducers/applicantFilesReducer";
+import {
+  OptionalFile,
+  RequirementFile,
+} from "../../store/reducers/applicantFilesReducer";
+
 import { useEffect, useState } from "react";
 import { getListApplicationRequirements } from ".";
 import {
@@ -29,28 +36,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { FaEye } from "react-icons/fa";
+import { IoInformationCircleOutline } from "react-icons/io5";
+import { FaTrash } from "react-icons/fa";
+import { CiCircleCheck } from "react-icons/ci";
 
 const Step1 = () => {
   const dispatch: AppDispatch = useDispatch();
+  const [isOpenOptionalFiles, setOpenOptionalFiles] = useState(false);
   const { applicantFiles, generalData } = useSelector((state: RootState) => ({
     applicantFiles: state.applicantFiles,
     generalData: state.generalData,
   }));
-
-  interface FormFile {
-    base64: string;
-    fileName: string;
-    uuid: string;
-  }
-
-  interface Requirement {
-    idRequisitos?: number;
-    nombre?: string;
-    tipo?: string;
-    adjunto?: null;
-    obligarorio?: number;
-  }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setLoading({ loading: true }));
@@ -58,7 +54,7 @@ const Step1 = () => {
     if (newFiles) {
       Array.from(newFiles).forEach(async (file: File) => {
         dispatch(
-          addFile({
+          addOptionalFile({
             fileName: file.name,
             base64: await fileToBase64(file),
             uuid: generateSecureuUUID(),
@@ -71,20 +67,48 @@ const Step1 = () => {
     }, 1000);
   };
 
-  const handleRemoveFile = (file: FormFile) => {
-    dispatch(removeFile({ uuid: file.uuid }));
+  const handleRemoveFile = (file: OptionalFile) => {
+    dispatch(removeOptionalFile({ uuid: file.uuid }));
   };
-
-  const [requirements, setRequirements] = useState([]);
 
   useEffect(() => {
     const getRequirementsList = async () => {
       dispatch(setLoading({ loading: true }));
-      setRequirements(await getListApplicationRequirements());
+      let listApplicationRequirements;
+      if (applicantFiles.applicantRequiredFiles.length == 0) {
+        listApplicationRequirements = listApplicationRequirements =
+          await getListApplicationRequirements();
+      } else {
+        listApplicationRequirements = applicantFiles.applicantRequiredFiles;
+      }
+
+      if (listApplicationRequirements) {
+        dispatch(
+          setRequiredFiles({
+            applicantRequiredFiles: listApplicationRequirements,
+          })
+        );
+      }
+
       dispatch(setLoading({ loading: false }));
     };
     getRequirementsList();
   }, [dispatch]);
+
+  const handleChangeRequired = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    item: RequirementFile
+  ) => {
+    const newFiles = event.target.files;
+    if (newFiles) {
+      dispatch(
+        editRequiredFile({
+          name: item.nombre,
+          base64: await fileToBase64(newFiles[0]),
+        })
+      );
+    }
+  };
 
   return (
     <div>
@@ -112,11 +136,11 @@ const Step1 = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {requirements
-                .filter((item: Requirement) => {
+              {applicantFiles.applicantRequiredFiles
+                ?.filter((item: RequirementFile) => {
                   return item.obligarorio == 1;
                 })
-                .map((item: Requirement, index) => (
+                .map((item: RequirementFile, index) => (
                   <TableRow key={index}>
                     <TableCell className="font-medium text-left text-base">
                       {item.nombre}
@@ -125,8 +149,19 @@ const Step1 = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      <div>
-                        <input type="file" name="" id="" />
+                      <div className="flex ">
+                        {item.base64 != null && item.base64 != "" && (
+                          <CiCircleCheck className="text-green-500 size-6" />
+                        )}
+
+                        <input
+                          type="file"
+                          name=""
+                          id=""
+                          onChange={(event) => {
+                            handleChangeRequired(event, item);
+                          }}
+                        />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -137,19 +172,24 @@ const Step1 = () => {
 
         <div className="mt-3 relative">
           <div className="text-left font-bold">
-            <span>Otros archivos </span>
-            <AlertDialog>
+            <span className="">Otros archivos </span>
+            <AlertDialog
+              open={isOpenOptionalFiles}
+              onOpenChange={setOpenOptionalFiles}
+            >
               <AlertDialogTrigger className="absolute mt-1 ml-2">
-                <FaEye className="size-5 " />
+                <IoInformationCircleOutline className="size-5" />
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Documentos opcionales</AlertDialogTitle>
                   <AlertDialogDescription>
                     <ul>
-                      {requirements
-                        .filter((item: Requirement) => item.obligarorio == 0)
-                        .map((item: Requirement, index) => {
+                      {applicantFiles.applicantRequiredFiles
+                        ?.filter(
+                          (item: RequirementFile) => item.obligarorio == 0
+                        )
+                        .map((item: RequirementFile, index) => {
                           return (
                             <li key={index} className="text-xl mb-3">
                               {item.nombre}
@@ -182,7 +222,7 @@ const Step1 = () => {
             </div>
           </div>
 
-          {applicantFiles.length > 0 && (
+          {applicantFiles.applicantOptionalFiles.length > 0 && (
             <Table className="table-auto w-full mt-5">
               <TableHeader>
                 <TableRow className="bg-slate-200	border border-slate-400 rounded">
@@ -191,19 +231,19 @@ const Step1 = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {applicantFiles.map((file, index) => (
+                {applicantFiles.applicantOptionalFiles?.map((file, index) => (
                   <TableRow key={index}>
                     <TableCell className="font-medium text-left text-blue-600/75">
                       {file.fileName}
                     </TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="flex justify-center">
                       <p
-                        className=" text-red-600 text-xl"
+                        className=" text-blue-600/75 text-xl"
                         onClick={() => {
                           handleRemoveFile(file);
                         }}
                       >
-                        Eliminar
+                        <FaTrash />
                       </p>
                     </TableCell>
                   </TableRow>
@@ -212,7 +252,13 @@ const Step1 = () => {
             </Table>
           )}
 
-          <p className="text-left mt-5">
+          <p className="text-left mt-2">
+            <p
+              className="font-bold text-gray-500 underline mb-4"
+              onClick={() => setOpenOptionalFiles(true)}
+            >
+              Ver documentos opcionales
+            </p>
             <p className="font-bold text-gray-500">
               Si el nombre del archivo cuenta con caracteres especiales no
               permitidos, los mismos serán reemplazados para evitar problemas en
